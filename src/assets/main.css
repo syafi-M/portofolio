@@ -1,0 +1,30 @@
+@import './base.css';
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Webkit-based browsers (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a081f; /* darker than the main bg */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b3b68; /* deep indigo */
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5a5a88; /* slightly lighter on hover */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3b3b68 #0a081f;
+}
