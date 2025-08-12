@@ -96,7 +96,7 @@ const headlineGradient = ref(null)
 const showIntro = ref(false)
 
 const typingRef = ref(null)
-const fullText = 'www.porto.kita.id'
+const fullText = 'https://syafi-m.github.io/portofolio/'
 const typedText = ref('')
 
 const icons = ['fas fa-code', 'fas fa-user', 'fab fa-github']

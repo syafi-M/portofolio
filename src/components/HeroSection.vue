@@ -91,7 +91,7 @@
       <!-- Social Icons -->
       <div class="flex justify-center lg:justify-start gap-6 text-white text-xl">
         <!-- GitHub -->
-        <div class="relative group flex flex-col items-center">
+        <a href="https://github.com/syafi-M" class="relative group flex flex-col items-center">
           <div
             class="absolute top-8 text-xs md:text-base lg:text-sm whitespace-nowrap text-purple-300 opacity-0 group-hover:opacity-100 transform group-hover:translate-y-1 transition duration-300"
           >
@@ -105,14 +105,17 @@
               class="w-6 h-6 md:w-8 md:h-8 lg:w-6 lg:h-6 text-white hover:text-purple-400 z-10 relative"
             />
           </div>
-        </div>
+        </a>
 
         <!-- Instagram -->
-        <div class="relative group flex flex-col items-center">
+        <a
+          href="https://www.instagram.com/sy4fx_xd?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+          class="relative group flex flex-col items-center"
+        >
           <div
             class="absolute top-8 text-xs md:text-base lg:text-sm text-indigo-300 opacity-0 group-hover:opacity-100 transform group-hover:translate-y-1 transition duration-300"
           >
-            Instagram
+            sy4fx_xd
           </div>
           <div class="relative group">
             <div
@@ -122,17 +125,20 @@
               class="w-6 h-6 md:w-8 md:h-8 lg:w-6 lg:h-6 text-white hover:text-indigo-400 z-10 relative"
             />
           </div>
-        </div>
+        </a>
 
         <!-- Divider -->
         <span class="text-white/50 mx-2">|</span>
 
         <!-- Instagram (Again) -->
-        <div class="relative group flex flex-col items-center">
+        <a
+          href="https://www.instagram.com/dityurbae/?utm_source=ig_web_button_share_sheet"
+          class="relative group flex flex-col items-center"
+        >
           <div
             class="absolute top-8 text-xs md:text-base lg:text-sm text-indigo-300 opacity-0 group-hover:opacity-100 transform group-hover:translate-y-1 transition duration-300"
           >
-            Instagram
+            dityurbae
           </div>
           <div class="relative group">
             <div
@@ -142,10 +148,10 @@
               class="w-6 h-6 md:w-8 md:h-8 lg:w-6 lg:h-6 text-white hover:text-indigo-400 z-10 relative"
             />
           </div>
-        </div>
+        </a>
 
         <!-- GitHub (Again) -->
-        <div class="relative group flex flex-col items-center">
+        <a href="https://github.com/aditlfp" class="relative group flex flex-col items-center">
           <div
             class="absolute top-8 text-xs md:text-base lg:text-sm text-purple-300 opacity-0 group-hover:opacity-100 transform group-hover:translate-y-1 transition duration-300"
           >
@@ -159,7 +165,7 @@
               class="w-6 h-6 md:w-8 md:h-8 lg:w-6 lg:h-6 text-white hover:text-purple-400 z-10 relative"
             />
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </section>
