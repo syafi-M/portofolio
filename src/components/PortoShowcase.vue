@@ -15,7 +15,7 @@
                 : 'text-white/50 hover:text-white',
             ]"
           >
-            Projects
+            {{ tm('showcase.proj') }}
           </button>
           <button
             @click="activeTab = 'certificates'"
@@ -26,7 +26,7 @@
                 : 'text-white/50 hover:text-white',
             ]"
           >
-            Certificates
+            {{ tm('showcase.cert') }}
           </button>
           <button
             @click="activeTab = 'techStack'"
@@ -37,7 +37,7 @@
                 : 'text-white/50 hover:text-white',
             ]"
           >
-            Tech Stack
+            {{ tm('showcase.tech') }}
           </button>
         </div>
       </div>
@@ -65,11 +65,10 @@
             </div>
           </div>
         </template>
-
         <!-- Actual Project Cards -->
         <template v-else>
           <div
-            v-for="proj in projectData.data.data || []"
+            v-for="proj in translatedProjects || []"
             :key="proj.id"
             class="relative group project-card md:col-span-1 col-span-2 max-w-md bg-gradient-to-br from-[#1b0c37]/60 to-[#281d5e]/60 rounded-xl p-6 shadow-lg overflow-hidden border border-white/10"
           >
@@ -77,7 +76,6 @@
             <div
               class="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 opacity-20 blur-lg scale-105 transition-all duration-500 group-hover:opacity-50 group-hover:scale-110 -z-10"
             ></div>
-
             <!-- Image -->
             <div class="rounded-lg mb-4">
               <img
@@ -86,13 +84,11 @@
                 class="rounded-md object-cover w-full h-[180px] sm:h-[200px] lg:h-[220px]"
               />
             </div>
-
             <!-- Title + Desc -->
             <h3 class="text-lg font-semibold text-white mb-1">{{ proj.title }}</h3>
             <p class="text-sm text-gray-300 mb-4 leading-relaxed line-clamp-3">
               {{ proj.description }}
             </p>
-
             <!-- Links -->
             <div class="flex justify-between items-center">
               <a
@@ -110,7 +106,6 @@
                   />
                 </svg>
               </a>
-
               <div class="relative group">
                 <div
                   class="absolute inset-0 rounded-lg bg-purple-500 opacity-50 blur-md -z-10 transition group-hover:opacity-80"
@@ -133,7 +128,6 @@
           </div>
         </template>
       </div>
-
       <!-- Certificates Grid -->
       <div
         v-show="activeTab === 'certificates'"
@@ -157,7 +151,6 @@
             <div class="h-8 bg-gray-600 rounded w-20"></div>
           </div>
         </template>
-
         <!-- Actual Certificate Cards -->
         <template v-else>
           <div
@@ -168,7 +161,6 @@
             <div
               class="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 opacity-20 blur-lg scale-105 transition-all duration-500 group-hover:opacity-50 group-hover:scale-110 -z-10"
             ></div>
-
             <div
               @click="openModal(cert.img)"
               class="rounded-lg relative overflow-hidden cursor-pointer"
@@ -183,7 +175,6 @@
                 class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300"
               ></div>
             </div>
-
             <div
               class="flex justify-between items-center absolute top-[40%] left-[40%] group-hover:opacity-100 opacity-0 transition-all duration-300"
             >
@@ -193,14 +184,12 @@
                 aria-label="See full certificate"
                 type="button"
               >
-                <Maximize2 />
-                See More
+                <Maximize2 /> See More
               </button>
             </div>
           </div>
         </template>
       </div>
-
       <!-- Tech Stack Grid -->
       <div
         v-show="activeTab === 'techStack'"
@@ -242,7 +231,6 @@
           <div
             class="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 opacity-20 blur-lg scale-105 transition-all duration-500 -z-10"
           ></div>
-
           <!-- Close Button -->
           <button
             @click="closeModal"
@@ -252,7 +240,6 @@
           >
             &times;
           </button>
-
           <!-- Image -->
           <img
             :src="getImage(modalImage) || 'https://placehold.co/600x400'"
@@ -265,21 +252,25 @@
     </transition>
   </section>
 </template>
-
 <script setup>
 import { nextTick, onMounted, ref, watch } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowRight, Maximize2 } from 'lucide-vue-next'
 import { getImage, useFetch } from '@/composables/useFetch'
+import { useI18n } from 'vue-i18n'
+import translateText from '@/utils/translator'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const activeTab = ref('projects')
+const { tm, locale } = useI18n()
+const lang = ref(locale.value)
 
+const activeTab = ref('projects')
 const projectsRef = ref(null)
 const certificatesRef = ref(null)
 const techStackRef = ref(null)
+
 const showModal = ref(false)
 const modalImage = ref('')
 
@@ -308,10 +299,7 @@ const techStack = [
     name: 'Node.js',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg',
   },
-  {
-    name: 'Laravel',
-    icon: 'https://www.vectorlogo.zone/logos/laravel/laravel-icon.svg',
-  },
+  { name: 'Laravel', icon: 'https://www.vectorlogo.zone/logos/laravel/laravel-icon.svg' },
   {
     name: 'Tailwind CSS',
     icon: 'https://www.vectorlogo.zone/logos/tailwindcss/tailwindcss-icon.svg',
@@ -320,10 +308,7 @@ const techStack = [
     name: 'MySQL',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
   },
-  {
-    name: 'Git',
-    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg',
-  },
+  { name: 'Git', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg' },
   {
     name: 'GitHub',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg',
@@ -334,43 +319,62 @@ const techStack = [
   },
 ]
 
-const { data: projectData, loading: loading } = useFetch(
-  'https://porto-api.sac-po.com/api/v1/projects',
-)
+const { data: projectData, loading } = useFetch('https://porto-api.sac-po.com/api/v1/projects')
 const { data: certificatesData, loading: loading2 } = useFetch(
   'https://porto-api.sac-po.com/api/v1/certificates',
 )
 
-watch(certificatesData, async (newTab) => {
-  console.log(newTab)
+// Translation
+const translatedProjects = ref([])
+
+async function translateProjects(toLang = lang.value) {
+  if (!projectData.value || loading.value) return
+
+  const results = await Promise.all(
+    projectData.value.data.data.map(async (proj) => {
+      const title = await translateText(proj.title, toLang)
+      const description = await translateText(proj.description, toLang)
+
+      // console.log(title, description, '')
+
+      return { ...proj, title, description }
+    }),
+  )
+
+  translatedProjects.value = results
+}
+
+watch([locale, projectData], ([newLocale], [oldLocale]) => {
+  if (newLocale !== oldLocale) {
+    lang.value = newLocale // keep lang in sync
+  }
+  // re-run translation whenever locale or projectData changes
+  translateProjects()
 })
 
-// call this when opening
+// Modal
 const openModal = (imgUrl) => {
   modalImage.value = imgUrl
   showModal.value = true
 }
-
 const closeModal = () => {
   showModal.value = false
 }
-
 const onImageError = (event) => {
   event.target.src = 'https://placehold.co/600x400'
 }
 
+// Animations
 const animateItems = (container, direction = 'x') => {
   const items = container.querySelectorAll('.project-card, .certificate-card, .tech-card')
 
   items.forEach((el, i) => {
-    // Reset immediately
     gsap.set(el, {
       opacity: 0,
       x: direction === 'x' ? (i % 2 === 0 ? -50 : 50) : 0,
       y: direction === 'y' ? 50 : 0,
     })
 
-    // Then animate in
     gsap.to(el, {
       opacity: 1,
       x: 0,
@@ -382,33 +386,14 @@ const animateItems = (container, direction = 'x') => {
   })
 }
 
+// Mounted animations
 onMounted(() => {
-  // animate grid items on mount
   nextTick(() => {
     animateItems(projectsRef.value, 'x')
   })
-
-  // Fetch projects and certificates
-  // const { data: projects } = useFetch('api/v1/projects')
-
-  // watchEffect(() => {
-  //   if (projects.value) {
-  //     console.log('Projects:', projects)
-  //   }
-  // })
-  // axios
-  //   .get('https://84652458b918.ngrok-free.app/sanctum/csrf-cookie')
-  //   .then(() => {
-  //     return axios.get('https://84652458b918.ngrok-free.app/api/v1/projects')
-  //   })
-  //   .then((response) => {
-  //     console.log('Projects:', response)
-  //   })
-  //   .catch((error) => {
-  //     console.error('Error fetching projects:', error)
-  //   })
 })
 
+// Tabs switching animation
 watch(activeTab, async (newTab) => {
   await nextTick()
   if (newTab === 'projects') {

@@ -1,21 +1,57 @@
 <script setup>
 import { getImage, useFetch } from '@/composables/useFetch'
+import translateText from '@/utils/translator'
 import { Code as IconCode, ExternalLink as IconExternal } from 'lucide-vue-next'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
+const { tm, locale } = useI18n()
+const lang = ref(locale.value)
+
 const { data: projectData, loading } = useFetch(
   `https://porto-api.sac-po.com/api/v1/projects/${route.params.id}`,
 )
-// console.log(route.params.id, projectData)
+
+console.log('API result:', projectData.value)
+
+// Translation
+const translatedProject = ref(null)
+
+async function translateProjects(toLang = lang.value) {
+  if (!projectData.value || loading.value) return
+
+  const proj = projectData.value.data
+  if (!proj) return
+
+  const title = await translateText(proj.title, toLang)
+  const description = await translateText(proj.description, toLang)
+  const feature = await Promise.all((proj.feature || []).map((feat) => translateText(feat, toLang)))
+
+  translatedProject.value = { ...proj, title, description, feature }
+}
+
+// re-run translation whenever locale or projectData changes
+watch([locale, projectData], ([newLocale], [oldLocale]) => {
+  if (newLocale !== oldLocale) {
+    lang.value = newLocale // keep lang in sync
+  }
+  translateProjects()
+})
 
 const onImageError = (event) => {
   event.target.src = 'https://placehold.co/500x300'
 }
 
-const project = computed(() => projectData.value?.data || {})
+// gunakan translatedProject jika ada, fallback ke original projectData
+const project = computed(() => translatedProject.value || projectData.value?.data || {})
+watch(project, (newVal) => {
+  if (newVal) {
+    console.log('Project data updated:', newVal)
+  }
+})
 </script>
 <template>
   <section class="min-h-screen w-full text-white px-6 lg:px-[10%] py-16 lg:py-28">
@@ -26,10 +62,10 @@ const project = computed(() => projectData.value?.data || {})
         @click="$router.push('/#showcase')"
         class="border border-white/20 px-3 py-1 rounded-lg hover:bg-white/10 transition text-white"
       >
-        ← Back
+        ← {{ tm('another.back') }}
       </button>
       <span class="mx-2">/</span>
-      <span class="opacity-50">Projects</span>
+      <span class="opacity-50">{{ tm('another.projects') }}</span>
       <span class="mx-2">/</span>
       <span class="text-white font-medium capitalize">{{ project.title }}</span>
     </div>
@@ -100,7 +136,7 @@ const project = computed(() => projectData.value?.data || {})
         <div class="bg-[#1b1b30] rounded-2xl border border-white/10 p-6">
           <div class="flex items-center gap-2 mb-4 text-yellow-400">
             <span class="text-xl">⭐</span>
-            <h3 class="font-semibold text-lg text-white">Key Features</h3>
+            <h3 class="font-semibold text-lg text-white">{{ tm('another.key') }}</h3>
           </div>
           <ul class="list-disc pl-6 text-white/70 md:text-base space-y-2">
             <li v-for="(feature, i) in project.feature || []" :key="i">
@@ -118,12 +154,12 @@ const project = computed(() => projectData.value?.data || {})
               target="_blank"
             >
               <IconExternal />
-              Live Demo
+              {{ tm('another.demo') }}
             </a>
           </div>
           <div>
             <h4 class="text-lg font-semibold mb-2 flex items-center gap-2">
-              <IconCode /> Technologies Used
+              <IconCode /> {{ tm('another.tecno') }}
             </h4>
             <div class="flex flex-wrap gap-3">
               <span

@@ -27,7 +27,5 @@ export function useFetch(url) {
 }
 
 export function getImage(name) {
-  console.log(`https://porto-api.sac-po.com/storage/${name}`)
-
   return `https://porto-api.sac-po.com/storage/${name}`
 }

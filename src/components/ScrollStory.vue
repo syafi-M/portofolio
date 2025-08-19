@@ -4,11 +4,11 @@
       <p
         class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent"
       >
-        About Us
+        {{ tm('about.title') }}
       </p>
       <div class="flex items-center justify-center space-x-4 mt-4 md:text-xl">
         <Brain class="text-purple-400" />
-        <p>"Mengubah ide menjadi karya"</p>
+        <p>"{{ tm('about.subTitle') }}"</p>
         <Gift class="text-indigo-500" />
       </div>
     </div>
@@ -28,8 +28,7 @@
               Frontend Developer
             </h2>
             <p class="text-base md:text-lg max-w-md md:ml-auto opacity-80 cursor-hover">
-              Membuat website modern, sistem desain yang konsisten, dan pengalaman pengguna berbasis
-              riset.
+              {{ tm('about.frontDesc') }}
             </p>
           </div>
           <!-- Backend Developer -->
@@ -42,8 +41,7 @@
               Backend Developer
             </h2>
             <p class="text-base md:text-lg max-w-md md:mr-auto opacity-80 cursor-hover">
-              Membangun sistem yang efisien, aman, dan scalable dengan struktur data yang rapi dan
-              optimal.
+              {{ tm('about.backDesc') }}
             </p>
           </div>
         </div>
@@ -51,9 +49,7 @@
     </div>
     <div>
       <p class="text-center md:text-lg opacity-70">
-        Kami adalah tim pengembang web yang berkomitmen untuk menciptakan solusi digital yang
-        inovatif dan fungsional. Dengan pengalaman di berbagai teknologi, kami siap membantu Anda
-        mewujudkan proyek impian Anda.
+        {{ tm('about.desc') }}
       </p>
     </div>
   </section>
@@ -69,8 +65,10 @@ import Back from '../assets/back.png'
 import BackHover from '../assets/g2.jpeg'
 import { Brain, Gift } from 'lucide-vue-next'
 import HoverImage from './HoverImage.vue'
+import { useI18n } from 'vue-i18n'
 
 gsap.registerPlugin(ScrollTrigger)
+const { tm } = useI18n()
 const preload = new Image()
 preload.src = FrontHover
 preload.src = BackHover

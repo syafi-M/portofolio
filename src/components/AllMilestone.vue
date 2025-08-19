@@ -4,11 +4,10 @@
       <h1
         class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent pb-4"
       >
-        Milestone
+        {{ tm('milestone.title') }}
       </h1>
       <p class="text-center text-lg md:text-xl opacity-70 mb-6 lg:mb-10 mx-10 lg:max-w-3xl">
-        Setiap langkah adalah pencapaian. Kami berdedikasi untuk terus tumbuh dan berkembang.
-        Berikut adalah beberapa pencapaian yang telah kami raih sejauh ini.
+        {{ tm('milestone.desc') }}
       </p>
       <div class="grid grid-cols-2 gap-8 w-full max-w-4xl px-4 md:px-16">
         <div
@@ -23,8 +22,8 @@
               {{ totalProjects }}
             </span>
           </div>
-          <p class="text-lg md:text-xl">Jumlah Project</p>
-          <p class="text-sm md:text-base">Website yang telah dibuat</p>
+          <p class="text-lg md:text-xl">{{ tm('milestone.projCount') }}</p>
+          <p class="text-sm md:text-base">{{ tm('milestone.subProj') }}</p>
         </div>
 
         <div
@@ -39,8 +38,8 @@
               {{ totalCertificates }}
             </span>
           </div>
-          <p class="text-lg md:text-xl">Jumlah Sertifikat</p>
-          <p class="text-sm md:text-base">sertifikat yang valid</p>
+          <p class="text-lg md:text-xl">{{ tm('milestone.certCount') }}</p>
+          <p class="text-sm md:text-base">{{ tm('milestone.subCert') }}</p>
         </div>
       </div>
     </div>
@@ -51,6 +50,9 @@
 import { computed, onMounted } from 'vue'
 import { BadgeCheck, Code } from 'lucide-vue-next'
 import { useFetch } from '@/composables/useFetch'
+import { useI18n } from 'vue-i18n'
+
+const { tm } = useI18n()
 
 // Ambil data dari API
 const { data: projectData } = useFetch('https://porto-api.sac-po.com/api/v1/projects')

@@ -5,11 +5,11 @@
     class="lg:h-screen lg:max-h-screen flex flex-col lg:flex-row items-start justify-between px-[10%] md:py-24 lg:pt-14 py-16 relative overflow-hidden cursor-hover"
   >
     <div ref="parallaxText" class="space-y-4 relative z-10 w-full">
-      <p class="text-5xl md:text-7xl font-extrabold tracking-tight">Fullstack</p>
+      <p class="text-5xl md:text-7xl font-extrabold tracking-tight">{{ t('hero.title1') }}</p>
       <p
         class="text-6xl md:text-8xl bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent font-extrabold tracking-tight"
       >
-        Developer
+        {{ t('hero.title2') }}
       </p>
       <p class="text-lg md:text-2xl text-white font-mono h-6 my-5">
         <span>{{ typedText }}</span
@@ -18,14 +18,13 @@
       <p
         class="md:text-xl lg:text-lg font-light text-gray-300 max-w-xl md:max-w-2xl lg:max-w-xl mb-6"
       >
-        Membuat website yang inovatif, fungsional, dan ramah pengguna, dengan fokus pada pengalaman
-        visual yang memukau dan performa yang optimal
+        {{ $t('hero.desc') }}
       </p>
 
       <!-- Tech Stack -->
       <div class="flex flex-wrap gap-3 mb-[18rem] md:mb-[18rem] lg:mb-0">
         <span
-          v-for="tech in ['React', 'Vue', 'Node.js', 'Laravel', 'Tailwind CSS']"
+          v-for="tech in techs"
           :key="tech"
           class="px-4 py-1 bg-white/10 text-white rounded-full text-xs md:text-base lg:text-sm font-medium backdrop-blur hover:bg-white/20 transition"
         >
@@ -52,13 +51,13 @@
             class="absolute inset-0 rounded-lg bg-purple-500 opacity-50 blur-md -z-10 transition group-hover:opacity-80"
           ></div>
           <a
-            href="#"
+            href="#showcase"
             class="inline-flex items-center gap-2 px-8 py-3 border border-purple-500 text-purple-300 rounded-lg bg-black/80 backdrop-blur z-10 relative whitespace-nowrap"
           >
             <span
               class="transform transition-transform duration-300 group-hover:translate-x-[-0.25rem] md:text-xl"
             >
-              Projects
+              {{ tm('hero.projects') }}
             </span>
             <SquareArrowOutUpRight
               class="w-5 h-5 transition-transform duration-300 ease-in-out group-hover:rotate-45 group-hover:translate-x-1.5"
@@ -79,7 +78,7 @@
             <span
               class="transform transition-transform duration-300 group-hover:translate-x-[-0.25rem] md:text-xl"
             >
-              Contacts
+              {{ tm('hero.contacts') }}
             </span>
             <MailPlus
               class="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1 group-hover:rotate-12"
@@ -178,8 +177,12 @@ import ScrollTrigger from 'gsap/ScrollTrigger'
 import { Github, Instagram, MailPlus, SquareArrowOutUpRight } from 'lucide-vue-next'
 import Gif from '../assets/Coding.json'
 import { Vue3Lottie } from 'vue3-lottie'
+import { useI18n } from 'vue-i18n'
 
 gsap.registerPlugin(ScrollTrigger)
+
+const { t, tm } = useI18n()
+const techs = tm('hero.techs')
 
 const heroRef = ref(null)
 const parallaxText = ref(null)

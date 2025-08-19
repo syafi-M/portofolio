@@ -9,7 +9,7 @@
   >
     <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
       <div class="text-white text-xl font-bold tracking-wide">
-        <a href="#home">Porto</a>
+        <a href="#home">Portofolio</a>
       </div>
 
       <!-- Hamburger button (mobile only) -->
@@ -50,9 +50,21 @@
       <div
         class="hidden md:flex items-center space-x-6 text-sm md:text-base font-medium text-white"
       >
-        <a href="#about" class="hover:text-purple-400 transition-colors">About</a>
-        <a href="#milestone" class="hover:text-purple-400 transition-colors">Milestone</a>
-        <a href="#showcase" class="hover:text-purple-400 transition-colors">Showcase</a>
+        <a href="#about" class="hover:text-purple-400 transition-colors">{{
+          tm('another.about')
+        }}</a>
+        <a href="#milestone" class="hover:text-purple-400 transition-colors">{{
+          tm('another.milestone')
+        }}</a>
+        <a href="#showcase" class="hover:text-purple-400 transition-colors">{{
+          tm('another.showcase')
+        }}</a>
+        <button
+          @click="toggleLanguage"
+          class="p-2 bg-white/10 rounded hover:bg-white/20 transition"
+        >
+          <Languages class="w-5 h-5 text-white" />
+        </button>
       </div>
     </nav>
 
@@ -69,31 +81,52 @@
         v-if="menuOpen"
         class="md:hidden px-4 pt-4 pb-10 text-white text-sm font-medium bg-[#0e0c2a]/70 backdrop-blur-md"
       >
-        <a href="#about" class="block py-2 text-lg hover:text-purple-400" @click="menuOpen = false"
-          >About</a
+        <a
+          href="#about"
+          class="block py-2 text-lg hover:text-purple-400"
+          @click="menuOpen = false"
+          >{{ tm('another.about') }}</a
         >
         <a
           href="#milestone"
           class="block py-2 text-lg hover:text-purple-400"
           @click="menuOpen = false"
-          >Milestone</a
+          >{{ tm('another.milestone') }}</a
         >
         <a
           href="#showcase"
           class="block py-2 text-lg hover:text-purple-400"
           @click="menuOpen = false"
-          >Showcase</a
+          >{{ tm('another.showcase') }}</a
         >
+        <div class="w-full flex justify-center mt-5">
+          <button
+            @click="toggleLanguage"
+            class="p-2 px-4 bg-white/10 flex items-center gap-2 rounded hover:bg-white/20 transition"
+          >
+            <Languages class="max-w-5 max-h-5 text-white" />
+            <p>{{ tm('another.translate') }}</p>
+          </button>
+        </div>
       </div>
     </Transition>
   </header>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, Transition } from 'vue'
+import { Languages } from 'lucide-vue-next'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { tm, locale } = useI18n()
 
 const scrolled = ref(false)
 const menuOpen = ref(false)
+
+async function toggleLanguage() {
+  const newLang = locale.value === 'en' ? 'id' : 'en'
+  locale.value = newLang
+}
 
 const handleScroll = () => {
   scrolled.value = window.scrollY > 10
