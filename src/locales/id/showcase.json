@@ -1,5 +1,6 @@
 {
   "proj": "Proyek",
   "cert": "Sertifikat",
-  "tech": "Teknologi"
+  "tech": "Teknologi",
+  "desc": "Halaman ini menampilkan karya, sertifikat, dan teknologi yang digunakan, sebagai gambaran singkat pengalaman, keterampilan, dan pencapaian."
 }

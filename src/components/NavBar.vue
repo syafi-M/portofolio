@@ -2,18 +2,26 @@
   <header
     :class="[
       'fixed top-0 left-0 w-full z-[99] transition-all duration-300',
-      scrolled
-        ? 'bg-[#0e0c2a]/70 backdrop-blur-md shadow-sm'
+      scrolled || menuOpen
+        ? 'bg-gradient-to-b from-[#0e0c2a]/50 md:from-[#0e0c2a]/90 to-transparent backdrop-blur-sm'
         : 'bg-transparent backdrop-blur-none shadow-none',
     ]"
   >
     <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-      <div class="text-white text-xl font-bold tracking-wide">
-        <a href="#home">Portofolio</a>
+      <div class="text-white text-xl font-bold tracking-wide relative">
+        <a
+          href="#home"
+          class="relative text-white drop-shadow-[0_0_4px_rgba(255,255,255,0.6)] hover:drop-shadow-[0_0_10px_rgba(168,85,247,0.8)] transition"
+        >
+          Portofolio
+        </a>
       </div>
 
       <!-- Hamburger button (mobile only) -->
-      <button @click="menuOpen = !menuOpen" class="md:hidden text-white focus:outline-none">
+      <button
+        @click="menuOpen = !menuOpen"
+        class="md:hidden text-white focus:outline-none drop-shadow-[0_0_4px_rgba(255,255,255,0.6)] hover:drop-shadow-[0_0_10px_rgba(168,85,247,0.8)] transition"
+      >
         <svg
           v-if="!menuOpen"
           xmlns="http://www.w3.org/2000/svg"
@@ -79,7 +87,7 @@
     >
       <div
         v-if="menuOpen"
-        class="md:hidden px-4 pt-4 pb-10 text-white text-sm font-medium bg-[#0e0c2a]/70 backdrop-blur-md"
+        class="md:hidden px-4 pt-4 pb-10 text-white text-sm font-medium drop-shadow-[0_0_4px_rgba(255,255,255,0.6)] hover:drop-shadow-[0_0_10px_rgba(168,85,247,0.8)] transition"
       >
         <a
           href="#about"

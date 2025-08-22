@@ -2,27 +2,27 @@
   <section
     id="home"
     ref="heroRef"
-    class="lg:h-screen lg:max-h-screen flex flex-col lg:flex-row items-start justify-between px-[10%] md:py-24 lg:pt-14 py-16 relative overflow-hidden cursor-hover"
+    class="lg:h-screen lg:max-h-screen flex flex-col lg:flex-row items-start justify-between px-[10%] md:py-24 lg:pt-20 py-16 relative overflow-hidden cursor-hover"
   >
-    <div ref="parallaxText" class="space-y-4 relative z-10 w-full">
+    <div ref="parallaxText" class="space-y-2 md:space-y-4 relative z-10 w-full pt-6 md:pt-0">
       <p class="text-5xl md:text-7xl font-extrabold tracking-tight">{{ t('hero.title1') }}</p>
       <p
         class="text-6xl md:text-8xl bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent font-extrabold tracking-tight"
       >
         {{ t('hero.title2') }}
       </p>
-      <p class="text-lg md:text-2xl text-white font-mono h-6 my-5">
+      <p class="text-lg md:text-2xl text-white font-mono h-6 my-4 lg:my-8">
         <span>{{ typedText }}</span
         ><span class="blinking-cursor">|</span>
       </p>
       <p
-        class="md:text-xl lg:text-lg font-light text-gray-300 max-w-xl md:max-w-2xl lg:max-w-xl mb-6"
+        class="md:text-xl lg:text-lg font-light text-gray-300 max-w-xl md:max-w-2xl lg:max-w-xl mb-2 md:mb-6"
       >
         {{ $t('hero.desc') }}
       </p>
 
       <!-- Tech Stack -->
-      <div class="flex flex-wrap gap-3 mb-[18rem] md:mb-[18rem] lg:mb-0">
+      <div class="flex flex-wrap gap-3 mb-[15rem] md:mb-[18rem] lg:mb-0">
         <span
           v-for="tech in techs"
           :key="tech"

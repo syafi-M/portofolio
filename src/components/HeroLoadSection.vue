@@ -2,7 +2,7 @@
   <section
     v-if="showIntro"
     ref="sectionRef"
-    class="fixed min-h-screen z-[100] w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#0e0c2a] to-[#1a133d] text-white text-center space-y-8"
+    class="fixed min-h-screen z-[100] w-full flex flex-col items-center pt-[30vh] lg:pt-0 lg:justify-center bg-gradient-to-br from-[#0e0c2a] to-[#1a133d] text-white text-center space-y-8"
   >
     <span ref="textRef">
       <!-- Glowing Icons -->

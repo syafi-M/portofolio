@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import Footer from './components/Footer.vue'
+import Footer from './components/MainFooter.vue'
 import BackgroundBlob from './components/BackgroundBlob.vue'
 import Navbar from './components/NavBar.vue'
 </script>

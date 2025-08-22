@@ -4,6 +4,9 @@
       <h1 class="text-3xl md:text-4xl font-bold text-white mb-0 md:mb-8 text-center">
         Portofolio Showcase
       </h1>
+      <p class="text-center text-lg md:text-xl opacity-70 mb-6 lg:mb-10 mx-10 lg:max-w-3xl">
+        {{ tm('showcase.desc') }}
+      </p>
       <div class="mb-6 border border-white/10 rounded-lg p-2">
         <div class="flex justify-center space-x-4">
           <button
@@ -79,7 +82,7 @@
             <!-- Image -->
             <div class="rounded-lg mb-4">
               <img
-                :src="proj.image || 'https://placehold.co/600x400'"
+                :src="getImage(proj.img) || 'https://placehold.co/600x400'"
                 :alt="proj.title"
                 class="rounded-md object-cover w-full h-[180px] sm:h-[200px] lg:h-[220px]"
               />

@@ -2,7 +2,7 @@
 import { getImage, useFetch } from '@/composables/useFetch'
 import translateText from '@/utils/translator'
 import { Code as IconCode, ExternalLink as IconExternal } from 'lucide-vue-next'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
@@ -15,22 +15,33 @@ const { data: projectData, loading } = useFetch(
   `https://porto-api.sac-po.com/api/v1/projects/${route.params.id}`,
 )
 
-console.log('API result:', projectData.value)
-
 // Translation
 const translatedProject = ref(null)
+const translationCache = new Map()
 
 async function translateProjects(toLang = lang.value) {
-  if (!projectData.value || loading.value) return
+  if (!projectData.value) return
 
   const proj = projectData.value.data
   if (!proj) return
+
+  const cacheKey = `${proj.id}-${toLang}`
+  if (translationCache.has(cacheKey)) {
+    translatedProject.value = translationCache.get(cacheKey)
+    return
+  }
+
+  loading.value = true // set loading to true while translating
 
   const title = await translateText(proj.title, toLang)
   const description = await translateText(proj.description, toLang)
   const feature = await Promise.all((proj.feature || []).map((feat) => translateText(feat, toLang)))
 
-  translatedProject.value = { ...proj, title, description, feature }
+  const result = { ...proj, title, description, feature }
+  translationCache.set(cacheKey, result) // ✅ store in cache
+  translatedProject.value = result
+
+  loading.value = false // set loading to false after translation
 }
 
 // re-run translation whenever locale or projectData changes
@@ -41,17 +52,19 @@ watch([locale, projectData], ([newLocale], [oldLocale]) => {
   translateProjects()
 })
 
+// ✅ run once when data is ready (so translation happens on first load too)
+watchEffect(() => {
+  if (projectData.value && !loading.value) {
+    translateProjects()
+  }
+})
+
 const onImageError = (event) => {
   event.target.src = 'https://placehold.co/500x300'
 }
 
 // gunakan translatedProject jika ada, fallback ke original projectData
-const project = computed(() => translatedProject.value || projectData.value?.data || {})
-watch(project, (newVal) => {
-  if (newVal) {
-    console.log('Project data updated:', newVal)
-  }
-})
+const project = computed(() => translatedProject.value || {})
 </script>
 <template>
   <section class="min-h-screen w-full text-white px-6 lg:px-[10%] py-16 lg:py-28">
@@ -70,7 +83,7 @@ watch(project, (newVal) => {
       <span class="text-white font-medium capitalize">{{ project.title }}</span>
     </div>
     <!-- Skeleton Loading -->
-    <template v-if="loading">
+    <template v-if="loading || !translatedProject">
       <div class="animate-pulse space-y-6">
         <!-- Image Skeleton -->
         <div class="flex flex-col md:flex-row items-start justify-between gap-12">
@@ -100,7 +113,7 @@ watch(project, (newVal) => {
     </template>
 
     <!-- Actual Content -->
-    <template v-else>
+    <template v-else-if="!loading || translatedProject">
       <!-- Title & Image -->
       <div class="flex flex-col md:flex-row items-start justify-between gap-12">
         <div
