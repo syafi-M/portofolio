@@ -4,7 +4,7 @@
     ref="heroRef"
     class="lg:h-screen lg:max-h-screen flex flex-col lg:flex-row items-start justify-between px-[10%] md:py-24 lg:pt-20 py-16 relative overflow-hidden cursor-hover"
   >
-    <div ref="parallaxText" class="space-y-2 md:space-y-4 relative z-10 w-full pt-6 md:pt-0">
+    <div class="space-y-2 md:space-y-4 relative z-10 w-full pt-6 md:pt-0">
       <p class="text-5xl md:text-7xl font-extrabold tracking-tight">{{ t('hero.title1') }}</p>
       <p
         class="text-6xl md:text-8xl bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent font-extrabold tracking-tight"
@@ -35,12 +35,12 @@
       <div
         class="overflow-hidden h-full absolute top-0 left-0 lg:left-auto right-0 z-0 mt-[6rem] md:mt-[8rem] lg:mt-0"
       >
-        <Vue3Lottie
-          :animationData="Gif"
-          class="max-w-[220px] md:max-w-[280px] lg:max-w-[340px] h-auto"
-          :loop="true"
-          :autoplay="true"
-        />
+        <Suspense>
+          <component :is="HeroLottie" v-if="showLottie" />
+          <template #fallback>
+            <div class="w-[220px] md:w-[280px] lg:w-[340px] h-[220px] md:h-[280px] lg:h-[340px]"></div>
+          </template>
+        </Suspense>
       </div>
 
       <!-- Navigation Links -->
@@ -171,27 +171,38 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import gsap from 'gsap'
-import ScrollTrigger from 'gsap/ScrollTrigger'
 import { Github, Instagram, MailPlus, SquareArrowOutUpRight } from 'lucide-vue-next'
-import Gif from '../assets/Coding.json'
-import { Vue3Lottie } from 'vue3-lottie'
 import { useI18n } from 'vue-i18n'
 
-gsap.registerPlugin(ScrollTrigger)
-
 const { t, tm } = useI18n()
-const techs = tm('hero.techs')
+const techs = computed(() => tm('hero.techs'))
+const HeroLottie = defineAsyncComponent(() => import('@/components/HeroLottie.vue'))
 
 const heroRef = ref(null)
-const parallaxText = ref(null)
+const INTRO_SESSION_KEY = 'introPlayed'
 
 const typedText = ref('')
+const showLottie = ref(false)
 const phrases = ['Web Development', 'Tech Enthusiast', 'Fullstack Engineer']
 let currentPhrase = 0
 let currentChar = 0
 let isDeleting = false
+let typingTimeoutId = null
+let lottieTimeoutId = null
+let heroIntroTween = null
+
+const clearTypingTimeout = () => {
+  if (typingTimeoutId) {
+    clearTimeout(typingTimeoutId)
+  }
+}
+
+const queueTypeLoop = (delay) => {
+  clearTypingTimeout()
+  typingTimeoutId = setTimeout(typeLoop, delay)
+}
 
 function typeLoop() {
   const current = phrases[currentPhrase]
@@ -200,7 +211,7 @@ function typeLoop() {
     typedText.value = current.slice(0, currentChar++)
     if (currentChar > current.length) {
       isDeleting = true
-      setTimeout(typeLoop, 1200) // pause before deleting
+      queueTypeLoop(1200)
       return
     }
   } else {
@@ -209,36 +220,61 @@ function typeLoop() {
       isDeleting = false
       currentChar = 0
       currentPhrase = (currentPhrase + 1) % phrases.length
-      setTimeout(typeLoop, 400) // short pause before next typing starts
+      queueTypeLoop(400)
       return
     }
   }
 
   const delay = isDeleting ? 50 : 100 + Math.random() * 50
-  setTimeout(typeLoop, delay)
+  queueTypeLoop(delay)
 }
 
 onMounted(() => {
-  const alreadyPlayed = sessionStorage.getItem('introPlayed')
-  if (alreadyPlayed === 'false') {
-    // blur fade-in animation
-    gsap.from(heroRef.value, {
-      opacity: 0,
-      y: 0,
-      filter: 'blur(10px)',
-      duration: 2,
-      ease: 'power2.out',
-      delay: 0.5,
-      onUpdate: function () {
-        gsap.set(heroRef.value, {
-          filter: 'blur(' + (10 - this.progress() * 10) + 'px)',
-        })
+  const alreadyPlayed = sessionStorage.getItem(INTRO_SESSION_KEY)
+
+  if (alreadyPlayed === 'true' && heroRef.value) {
+    heroIntroTween = gsap.fromTo(
+      heroRef.value,
+      {
+        opacity: 0,
+        filter: 'blur(10px)',
       },
+      {
+        opacity: 1,
+        filter: 'blur(0px)',
+        y: 0,
+        duration: 1.4,
+        ease: 'power2.out',
+        delay: 0.2,
+      },
+    )
+  } else if (heroRef.value) {
+    gsap.set(heroRef.value, {
+      opacity: 1,
+      filter: 'blur(0px)',
     })
   }
 
-  // start typing loop
+  const loadLottie = () => {
+    showLottie.value = true
+  }
+
+  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+    window.requestIdleCallback(loadLottie, { timeout: 1200 })
+  } else {
+    lottieTimeoutId = setTimeout(loadLottie, 300)
+  }
+
   typeLoop()
+})
+
+onBeforeUnmount(() => {
+  clearTypingTimeout()
+  if (lottieTimeoutId) {
+    clearTimeout(lottieTimeoutId)
+  }
+  heroIntroTween?.kill()
+  gsap.killTweensOf(heroRef.value)
 })
 </script>
 

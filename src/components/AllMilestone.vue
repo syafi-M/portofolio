@@ -11,35 +11,21 @@
       </p>
       <div class="grid grid-cols-2 gap-8 w-full max-w-4xl px-4 md:px-16">
         <div
-          class="relative group div-card bg-gradient-to-br from-[#1b0c37]/60 to-[#281d5e]/60 col-span-2 lg:col-span-1 p-4 rounded-lg shadow-lg"
+          v-for="item in milestoneCards"
+          :key="item.id"
+          class="relative group milestone-card bg-gradient-to-br from-[#1b0c37]/60 to-[#281d5e]/60 col-span-2 lg:col-span-1 p-4 rounded-lg shadow-lg"
         >
           <div
             class="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 opacity-20 blur-lg scale-105 transition-all duration-500 group-hover:opacity-50 group-hover:scale-105 -z-10"
           ></div>
           <div class="flex items-center justify-between space-x-4 mb-5">
-            <Code class="bg-violet-600/40 rounded-full p-3 w-14 md:w-16 h-auto" />
+            <component :is="item.icon" class="bg-violet-600/40 rounded-full p-3 w-14 md:w-16 h-auto" />
             <span class="text-4xl font-semibold">
-              {{ totalProjects }}
+              {{ item.total }}
             </span>
           </div>
-          <p class="text-lg md:text-xl">{{ tm('milestone.projCount') }}</p>
-          <p class="text-sm md:text-base">{{ tm('milestone.subProj') }}</p>
-        </div>
-
-        <div
-          class="relative group div-card bg-gradient-to-br from-[#1b0c37]/60 to-[#281d5e]/60 col-span-2 lg:col-span-1 p-4 rounded-lg shadow-lg"
-        >
-          <div
-            class="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 opacity-20 blur-lg scale-105 transition-all duration-500 group-hover:opacity-50 group-hover:scale-105 -z-10"
-          ></div>
-          <div class="flex items-center justify-between space-x-4 mb-5">
-            <BadgeCheck class="bg-violet-600/40 rounded-full p-3 w-14 md:w-16 h-auto" />
-            <span class="text-4xl font-semibold">
-              {{ totalCertificates }}
-            </span>
-          </div>
-          <p class="text-lg md:text-xl">{{ tm('milestone.certCount') }}</p>
-          <p class="text-sm md:text-base">{{ tm('milestone.subCert') }}</p>
+          <p class="text-lg md:text-xl">{{ item.title }}</p>
+          <p class="text-sm md:text-base">{{ item.subtitle }}</p>
         </div>
       </div>
     </div>
@@ -47,7 +33,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { BadgeCheck, Code } from 'lucide-vue-next'
 import { useFetch } from '@/composables/useFetch'
 import { useI18n } from 'vue-i18n'
@@ -61,12 +47,26 @@ const { data: certificatesData } = useFetch('https://porto-api.sac-po.com/api/v1
 // Gunakan computed untuk menghitung total
 const totalProjects = computed(() => projectData.value?.data?.total || 0)
 const totalCertificates = computed(() => certificatesData.value?.data?.total || 0)
-
-onMounted(() => {})
+const milestoneCards = computed(() => [
+  {
+    id: 'projects',
+    icon: Code,
+    total: totalProjects.value,
+    title: tm('milestone.projCount'),
+    subtitle: tm('milestone.subProj'),
+  },
+  {
+    id: 'certificates',
+    icon: BadgeCheck,
+    total: totalCertificates.value,
+    title: tm('milestone.certCount'),
+    subtitle: tm('milestone.subCert'),
+  },
+])
 </script>
 
 <style scoped>
-.div-card {
+.milestone-card {
   will-change: transform, opacity;
 }
 </style>

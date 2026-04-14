@@ -1,4 +1,12 @@
+const translationCache = new Map()
+
 export default async function translateText(text, to) {
+  const cacheKey = `${to}:${text}`
+
+  if (translationCache.has(cacheKey)) {
+    return translationCache.get(cacheKey)
+  }
+
   const res = await fetch('https://translatorr-psi.vercel.app/api/translate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -8,6 +16,9 @@ export default async function translateText(text, to) {
     }),
   })
   const data = await res.json()
+  const translatedText = data.translations[0]
 
-  return data.translations[0]
+  translationCache.set(cacheKey, translatedText)
+
+  return translatedText
 }

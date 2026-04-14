@@ -12,14 +12,14 @@
         <Gift class="text-indigo-500" />
       </div>
     </div>
-    <div class="story-block min-h-full py-4 bg-[#0e0c2a]/50 text-white">
+    <div class="story-shell min-h-full py-4 bg-[#0e0c2a]/50 text-white">
       <div class="container mx-auto px-2 md:px-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative">
           <!-- Optional center divider line -->
           <div class="hidden md:block absolute left-1/2 top-0 h-full w-[2px] bg-white/10"></div>
           <div class="md:hidden block absolute top-1/2 h-[4px] w-full bg-white/10"></div>
           <!-- Frontend Developer -->
-          <div class="story-block text-center md:text-right space-y-4 z-10">
+          <div class="story-card text-center md:text-right space-y-4 z-10">
             <HoverImage :src="Front" :hoverSrc="FrontHover" class="mx-auto md:ml-auto" />
             <p class="text-lg font-semibold cursor-hover text-center">syafi-M</p>
             <h2
@@ -32,7 +32,7 @@
             </p>
           </div>
           <!-- Backend Developer -->
-          <div class="story-block text-center md:text-left space-y-4 z-10">
+          <div class="story-card text-center md:text-left space-y-4 z-10">
             <HoverImage :src="Back" :hoverSrc="BackHover" class="mx-auto md:ml-auto" />
             <p class="text-lg font-semibold cursor-hover text-center">aditlfp</p>
             <h2
@@ -56,53 +56,62 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
-import Front from '../assets/front.png'
-import FrontHover from '../assets/front2.jpg'
-import Back from '../assets/back.png'
-import BackHover from '../assets/g2.jpeg'
+import Front from '../assets/front.webp'
+import FrontHover from '../assets/front2.webp'
+import Back from '../assets/back.webp'
+import BackHover from '../assets/back2.webp'
 import { Brain, Gift } from 'lucide-vue-next'
 import HoverImage from './HoverImage.vue'
 import { useI18n } from 'vue-i18n'
 
 gsap.registerPlugin(ScrollTrigger)
 const { tm } = useI18n()
-const preload = new Image()
-preload.src = FrontHover
-preload.src = BackHover
-
 const storyRef = ref(null)
+let storyContext = null
+
+const preloadImage = (src) => {
+  const image = new Image()
+  image.src = src
+  return image
+}
 
 onMounted(() => {
-  const ctx = gsap.context(() => {
-    gsap.utils.toArray('.story-block').forEach((el) => {
+  preloadImage(FrontHover)
+  preloadImage(BackHover)
+
+  storyContext = gsap.context(() => {
+    const cards = gsap.utils.toArray('.story-card')
+
+    cards.forEach((el) => {
       gsap.from(el, {
         scrollTrigger: {
           trigger: el,
           start: 'top 80%',
+          once: true,
           toggleActions: 'play none none none',
         },
         opacity: 0,
         y: 30,
-        duration: 1,
+        duration: 0.8,
         ease: 'power2.out',
       })
     })
   }, storyRef.value)
+})
 
-  onUnmounted(() => {
-    ctx.revert()
-  })
+onBeforeUnmount(() => {
+  storyContext?.revert()
 })
 </script>
 
 <style scoped>
-.story-block {
+.story-card {
   transition: transform 0.3s ease;
 }
-.story-block:hover {
+.story-card:hover {
   transform: translateY(-4px);
 }
 section {

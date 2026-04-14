@@ -82,9 +82,11 @@
             <!-- Image -->
             <div class="rounded-lg mb-4">
               <img
-                :src="getImage(proj.img) || 'https://placehold.co/600x400'"
+                :src="getImage(proj.img) || IMAGE_PLACEHOLDER"
                 :alt="proj.title"
                 class="rounded-md object-cover w-full h-[180px] sm:h-[200px] lg:h-[220px]"
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <!-- Title + Desc -->
@@ -158,7 +160,7 @@
         <template v-else>
           <div
             class="relative group certificate-card md:col-span-1 col-span-2 max-w-md bg-gradient-to-br from-[#1b0c37]/60 to-[#281d5e]/60 rounded-xl p-4 shadow-lg overflow-hidden border border-white/10"
-            v-for="cert in certificatesData.data.data || []"
+            v-for="cert in certificates"
             :key="cert.id"
           >
             <div
@@ -169,10 +171,12 @@
               class="rounded-lg relative overflow-hidden cursor-pointer"
             >
               <img
-                :src="getImage(cert.img) || 'https://placehold.co/400x400'"
+                :src="getImage(cert.img) || IMAGE_PLACEHOLDER"
                 alt="Certificate"
                 class="rounded-md object-cover w-full h-[180px] sm:h-[200px] lg:h-[220px] transition duration-300"
                 @error="onImageError"
+                loading="lazy"
+                decoding="async"
               />
               <div
                 class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300"
@@ -213,6 +217,8 @@
               :src="tech.icon"
               :alt="tech.name"
               class="rounded-md object-cover w-[100px] min-h-[100px] sm:min-h-[100px] lg:min-h-[100px]"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
@@ -245,7 +251,7 @@
           </button>
           <!-- Image -->
           <img
-            :src="getImage(modalImage) || 'https://placehold.co/600x400'"
+            :src="getImage(modalImage) || IMAGE_PLACEHOLDER"
             alt="Full view certificate"
             class="rounded-lg max-h-[70vh] w-full object-contain"
             @error="onImageError"
@@ -256,18 +262,15 @@
   </section>
 </template>
 <script setup>
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowRight, Maximize2 } from 'lucide-vue-next'
 import { getImage, useFetch } from '@/composables/useFetch'
 import { useI18n } from 'vue-i18n'
 import translateText from '@/utils/translator'
 
-gsap.registerPlugin(ScrollTrigger)
-
 const { tm, locale } = useI18n()
-const lang = ref(locale.value)
+const IMAGE_PLACEHOLDER = 'https://placehold.co/600x400'
 
 const activeTab = ref('projects')
 const projectsRef = ref(null)
@@ -326,34 +329,44 @@ const { data: projectData, loading } = useFetch('https://porto-api.sac-po.com/ap
 const { data: certificatesData, loading: loading2 } = useFetch(
   'https://porto-api.sac-po.com/api/v1/certificates',
 )
+const projects = computed(() => projectData.value?.data?.data ?? [])
+const certificates = computed(() => certificatesData.value?.data?.data ?? [])
 
 // Translation
 const translatedProjects = ref([])
+const translationRuns = ref(0)
+let showcaseContext = null
 
-async function translateProjects(toLang = lang.value) {
-  if (!projectData.value || loading.value) return
+async function translateProjects(toLang = locale.value) {
+  if (!projects.value.length) {
+    translatedProjects.value = []
+    return
+  }
+
+  if (toLang === 'id') {
+    translatedProjects.value = projects.value
+    return
+  }
+
+  const runId = ++translationRuns.value
 
   const results = await Promise.all(
-    projectData.value.data.data.map(async (proj) => {
+    projects.value.map(async (proj) => {
       const title = await translateText(proj.title, toLang)
       const description = await translateText(proj.description, toLang)
-
-      // console.log(title, description, '')
 
       return { ...proj, title, description }
     }),
   )
 
-  translatedProjects.value = results
+  if (runId === translationRuns.value) {
+    translatedProjects.value = results
+  }
 }
 
-watch([locale, projectData], ([newLocale], [oldLocale]) => {
-  if (newLocale !== oldLocale) {
-    lang.value = newLocale // keep lang in sync
-  }
-  // re-run translation whenever locale or projectData changes
-  translateProjects()
-})
+watch([locale, projects], ([newLocale]) => {
+  translateProjects(newLocale)
+}, { immediate: true })
 
 // Modal
 const openModal = (imgUrl) => {
@@ -364,48 +377,81 @@ const closeModal = () => {
   showModal.value = false
 }
 const onImageError = (event) => {
-  event.target.src = 'https://placehold.co/600x400'
+  event.target.src = IMAGE_PLACEHOLDER
 }
 
 // Animations
 const animateItems = (container, direction = 'x') => {
-  const items = container.querySelectorAll('.project-card, .certificate-card, .tech-card')
+  if (!container) {
+    return
+  }
 
-  items.forEach((el, i) => {
-    gsap.set(el, {
+  const items = Array.from(container.querySelectorAll('.project-card, .certificate-card, .tech-card'))
+
+  if (!items.length) {
+    return
+  }
+
+  gsap.killTweensOf(items)
+
+  gsap.fromTo(
+    items,
+    {
       opacity: 0,
-      x: direction === 'x' ? (i % 2 === 0 ? -50 : 50) : 0,
-      y: direction === 'y' ? 50 : 0,
-    })
-
-    gsap.to(el, {
+      x: direction === 'x' ? (index) => (index % 2 === 0 ? -40 : 40) : 0,
+      y: direction === 'y' ? 40 : 0,
+    },
+    {
       opacity: 1,
       x: 0,
       y: 0,
-      delay: i * 0.05,
-      duration: 0.7,
+      duration: 0.55,
       ease: 'power2.out',
-    })
-  })
+      stagger: 0.05,
+      overwrite: 'auto',
+    },
+  )
 }
 
-// Mounted animations
-onMounted(() => {
-  nextTick(() => {
-    animateItems(projectsRef.value, 'x')
-  })
-})
-
-// Tabs switching animation
-watch(activeTab, async (newTab) => {
+const animateActiveTab = async (tab = activeTab.value) => {
   await nextTick()
-  if (newTab === 'projects') {
+
+  if (tab === 'projects') {
     animateItems(projectsRef.value, 'x')
-  } else if (newTab === 'certificates') {
+  } else if (tab === 'certificates') {
     animateItems(certificatesRef.value, 'x')
-  } else if (newTab === 'techStack') {
+  } else if (tab === 'techStack') {
     animateItems(techStackRef.value, 'y')
   }
+}
+
+const handleEscape = (event) => {
+  if (event.key === 'Escape' && showModal.value) {
+    closeModal()
+  }
+}
+
+onMounted(() => {
+  showcaseContext = gsap.context(() => {
+    animateActiveTab()
+  })
+  document.addEventListener('keydown', handleEscape)
+})
+
+watch(activeTab, async (newTab) => {
+  animateActiveTab(newTab)
+})
+
+watch([translatedProjects, certificates], async () => {
+  if (activeTab.value === 'projects' || activeTab.value === 'certificates') {
+    animateActiveTab()
+  }
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleEscape)
+  showcaseContext?.revert()
+  gsap.killTweensOf('.project-card, .certificate-card, .tech-card')
 })
 </script>
 

@@ -56,7 +56,7 @@
         href="https://eki.my.id"
         class="mt-6 inline-block px-6 py-3 rounded-full text-sm font-medium text-white bg-[#1f183b] relative shadow-lg hover:scale-105 transition duration-300"
       >
-        <span class="z-10 relative flex items-center" ref="typingRef">
+        <span class="typing-text z-10 relative flex items-center">
           <i class="mr-2">🌐</i>
           <span>{{ typedText }}</span>
         </span>
@@ -68,7 +68,7 @@
 </template>
 
 <style scoped>
-span[ref='typingRef'] span::after {
+.typing-text span::after {
   content: '|';
   animation: blink 0.8s infinite;
   margin-left: 2px;
@@ -86,7 +86,7 @@ span[ref='typingRef'] span::after {
 </style>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onBeforeUnmount, onMounted, nextTick } from 'vue'
 import gsap from 'gsap'
 
 const sectionRef = ref(null)
@@ -95,16 +95,75 @@ const headlineWhite = ref(null)
 const headlineGradient = ref(null)
 const showIntro = ref(false)
 
-const typingRef = ref(null)
 const fullText = 'https://syafi-m.github.io/portofolio/'
 const typedText = ref('')
 
 const icons = ['fas fa-code', 'fas fa-user', 'fab fa-github']
 const whiteWords = ['Welcome', 'To', 'Our']
 const gradientWords = ['Portofolio', 'Website']
+const INTRO_SESSION_KEY = 'introPlayed'
+
+let typingTimeoutId = null
+let outroTimeoutId = null
+let introTimeline = null
+
+const clearTimer = (timerId) => {
+  if (timerId) {
+    clearTimeout(timerId)
+  }
+}
+
+const scheduleTyping = (index = 0) => {
+  if (!showIntro.value) {
+    return
+  }
+
+  typedText.value = fullText.slice(0, index)
+
+  if (index >= fullText.length) {
+    outroTimeoutId = setTimeout(playOutro, 500)
+    return
+  }
+
+  const randomDelay = 100 + Math.random() * 80
+  typingTimeoutId = setTimeout(() => {
+    scheduleTyping(index + 1)
+  }, randomDelay)
+}
+
+const playOutro = () => {
+  if (!sectionRef.value || !textRef.value) {
+    showIntro.value = false
+    return
+  }
+
+  const outroTimeline = gsap.timeline({
+    onComplete: () => {
+      showIntro.value = false
+    },
+  })
+
+  outroTimeline.to(textRef.value, {
+    opacity: 0,
+    filter: 'blur(10px)',
+    duration: 1.2,
+    ease: 'power2.out',
+  })
+
+  outroTimeline.to(
+    sectionRef.value,
+    {
+      opacity: 0,
+      scale: 1.05,
+      duration: 2,
+      ease: 'power2.inOut',
+    },
+    '-=0.2',
+  )
+}
 
 onMounted(async () => {
-  const alreadyPlayed = sessionStorage.getItem('introPlayed')
+  const alreadyPlayed = sessionStorage.getItem(INTRO_SESSION_KEY)
 
   if (alreadyPlayed === 'true') {
     showIntro.value = false
@@ -112,70 +171,42 @@ onMounted(async () => {
   }
 
   // First load in this browser tab
-  sessionStorage.setItem('introPlayed', 'true')
+  sessionStorage.setItem(INTRO_SESSION_KEY, 'true')
   showIntro.value = true
   await nextTick()
 
-  // Start typing after a delay
-  setTimeout(() => {
-    let index = 0
-    const typeNext = () => {
-      if (index <= fullText.length) {
-        typedText.value = fullText.slice(0, index)
-        index++
-        const randomDelay = 100 + Math.random() * 80
-        setTimeout(typeNext, randomDelay)
-      } else {
-        // After typing is complete, wait 300ms
-        setTimeout(() => {
-          // Fade out text content
-          gsap.to(textRef.value, {
-            opacity: 0,
-            duration: 1.2,
-            ease: 'power2.Out',
-            onUpdate: function () {
-              gsap.set(textRef.value, {
-                filter: 'blur(' + (10 - this.progress() * 10) + 'px)',
-              })
-            },
-          })
-
-          // Then zoom/fade out whole section
-          gsap.to(sectionRef.value, {
-            opacity: 0,
-            scale: 1.05,
-            duration: 2,
-            ease: 'power2.inOut',
-            delay: 0.5,
-            onComplete: () => {
-              // After zoom out, hide the section
-              sectionRef.value.style.display = 'none'
-            },
-          })
-        }, 500)
-      }
-    }
-
-    typeNext()
-  }, 1000) // Wait before typing starts
-
-  // Animate white words
-  gsap.to(headlineWhite.value.children, {
+  introTimeline = gsap.timeline()
+  introTimeline.to(headlineWhite.value?.children ?? [], {
     opacity: 1,
     x: 0,
     duration: 1,
     ease: 'power3.out',
     stagger: 0.1,
   })
+  introTimeline.to(
+    headlineGradient.value?.children ?? [],
+    {
+      opacity: 1,
+      x: 0,
+      duration: 1,
+      ease: 'power3.out',
+      stagger: 0.1,
+    },
+    0.3,
+  )
 
-  // Animate gradient words
-  gsap.to(headlineGradient.value.children, {
-    opacity: 1,
-    x: 0,
-    duration: 1,
-    ease: 'power3.out',
-    stagger: 0.1,
-    delay: 0.3,
-  })
+  typingTimeoutId = setTimeout(() => {
+    scheduleTyping()
+  }, 1000)
+})
+
+onBeforeUnmount(() => {
+  clearTimer(typingTimeoutId)
+  clearTimer(outroTimeoutId)
+  introTimeline?.kill()
+  gsap.killTweensOf(textRef.value)
+  gsap.killTweensOf(sectionRef.value)
+  gsap.killTweensOf(headlineWhite.value?.children ?? [])
+  gsap.killTweensOf(headlineGradient.value?.children ?? [])
 })
 </script>
