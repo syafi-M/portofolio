@@ -1,0 +1,1 @@
+const a=new Map;async function c(n,e){const t=`${e}:${n}`;if(a.has(t))return a.get(t);const s=(await(await fetch("https://translatorr-psi.vercel.app/api/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({texts:[n],targetLang:e})})).json()).translations[0];return a.set(t,s),s}export{c as t};

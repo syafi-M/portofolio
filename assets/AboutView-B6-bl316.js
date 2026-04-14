@@ -1,0 +1,1 @@
+import{_ as t}from"./index-BTW8uoq0.js";import{m as e,y as s,l as r}from"./vendor-vue-CXkZGQTU.js";import"./vendor-routing-C_CzPUss.js";import"./vendor-gsap-a3sj5zmn.js";const a={},n={class:"about"};function c(i,o){return r(),e("div",n,[...o[0]||(o[0]=[s("h1",null,"This is an about page",-1)])])}const f=t(a,[["render",c]]);export{f as default};
