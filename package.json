@@ -16,7 +16,7 @@
   "dependencies": {
     "@studio-freight/lenis": "^1.0.42",
     "@tailwindcss/vite": "^4.1.11",
-    "axios": "^1.10.0",
+    "axios": "^1.18.0",
     "free-translate": "^0.6.1",
     "google-translate-api-x": "^10.7.2",
     "gsap": "^3.13.0",
@@ -41,8 +41,8 @@
     "globals": "^16.2.0",
     "jsdom": "^26.1.0",
     "prettier": "3.5.3",
-    "vite": "^7.0.0",
-    "vite-plugin-vue-devtools": "^7.7.7",
-    "vitest": "^3.2.4"
+    "vite": "^8.1.5",
+    "vite-plugin-vue-devtools": "^8.2.1",
+    "vitest": "^4.1.10"
   }
 }
